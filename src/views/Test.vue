@@ -14,17 +14,13 @@
          </ul>
       </div>
 
-      <!-- Вкладки -->
+      <!-- Вкладки (оставлю как есть, данные можно менять) -->
       <div class="operations">
          <div class="operations__tab-container">
             <button v-for="tab in tabs" :key="tab.id" :class="[
-               'btn-op',
-               'operations__tab',
-               `operations__tab--${tab.id}`,
+               'btn-op', 'operations__tab', `operations__tab--${tab.id}`,
                activeTab === tab.id ? 'operations__tab--active' : ''
-            ]" @click="activeTab = tab.id">
-               {{ tab.title }}
-            </button>
+            ]" @click="activeTab = tab.id">{{ tab.title }}</button>
          </div>
 
          <div v-for="tab in tabs" :key="tab.id"
@@ -38,7 +34,7 @@
          </div>
       </div>
 
-      <!-- Контактная форма -->
+      <!-- Netlify форма с валидацией -->
       <div class="section-footer">
          <p>
             <img src="https://img.icons8.com/matisse/100/light-on.png" alt="light-on" />
@@ -82,7 +78,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 
-// ---- Форма и валидация ----
+/* ---- Форма и валидация ---- */
 const form = reactive({
    name: '',
    phone: ''
@@ -96,20 +92,36 @@ const errors = reactive({
 const successMessage = ref('')
 const submitError = ref('')
 
+/**
+ * Срабатывает при вводе в поле телефона.
+ * Оставляет только цифры и ведущий плюс (если есть).
+ */
 const onPhoneInput = (e) => {
    let v = e.target.value
+   // разрешаем ведущий + и цифры
+   // если + не в начале — удаляем
    if (v.includes('+')) {
-      v = v.replace(/(?!^\+)[^0-9]/g, '')
-      v = v.replace(/\++/g, (m, offset) => (offset === 0 ? '+' : ''))
+      // оставляем только плюс в начале и цифры
+      v = v.replace(/(?!^\+)[^0-9]/g, '') // убрать не-цифры кроме ведущего +
+      // если несколько плюсов — удалить все после первого
+      v = v.replace(/\++/g, (m, offset) => offset === 0 ? '+' : '')
    } else {
       v = v.replace(/\D/g, '')
    }
    form.phone = v
 }
 
+/**
+ * Проверка формы: возвращает true если валидна.
+ * Правила:
+ *  - имя не пустое (trim)
+ *  - телефон: допускаем +в начале, дальше только цифры
+ *  - после удаления нецифр длина цифр 10..12 (учтём варианты 7/8/без кода)
+ */
 const validateForm = () => {
    let ok = true
 
+   // имя
    if (!form.name || !form.name.trim()) {
       errors.name = 'Введите имя'
       ok = false
@@ -117,7 +129,8 @@ const validateForm = () => {
       errors.name = ''
    }
 
-   const digits = form.phone.replace(/\D/g, '')
+   // телефон — убираем + и считаем цифры
+   const digits = form.phone.replace(/\D/g, '') // только цифры
    if (!digits) {
       errors.phone = 'Введите телефон'
       ok = false
@@ -131,6 +144,9 @@ const validateForm = () => {
    return ok
 }
 
+/**
+ * Отправка формы (для Netlify — POST на корень с FormData)
+ */
 const handleSubmit = async () => {
    successMessage.value = ''
    submitError.value = ''
@@ -143,11 +159,17 @@ const handleSubmit = async () => {
       fd.append('name', form.name.trim())
       fd.append('phone', form.phone)
 
-      const res = await fetch('/', { method: 'POST', body: fd })
+      const res = await fetch('/', {
+         method: 'POST',
+         body: fd
+      })
 
-      if (!res.ok) throw new Error('Ошибка сервера')
+      if (!res.ok) {
+         throw new Error('Сервер вернул ошибку при отправке')
+      }
 
       successMessage.value = 'Спасибо! Ваша заявка отправлена ✅'
+      // очистим форму
       form.name = ''
       form.phone = ''
    } catch (err) {
@@ -156,12 +178,32 @@ const handleSubmit = async () => {
    }
 }
 
-// ---- Вкладки ----
+/* ---- Вкладки ---- */
 const activeTab = ref(1)
 const tabs = [
-   { id: 1, title: 'Полное обучение', header: '✅ Полное обучение с нуля (онлайн)', text: 'Идеально для тех, кто хочет освоить домашнее пивоварение с азов.', list: ['Разбор оборудования', 'Изучение технологии', 'Создание рецептов'], price: 'Стоимость: 20 000 рублей' },
-   { id: 2, title: 'Онлайн-консультации', header: '✅ Онлайн-консультация по сложным вопросам', text: 'Помогаем при наличии оборудования.', list: ['Разбор ситуации', 'Рекомендации'], price: 'Стоимость: индивидуально' },
-   { id: 3, title: 'Составление рецептов', header: '✅ Составление индивидуальных рецептов', list: ['Рецепт под запрос', 'Сопровождение'], price: 'от 3 000 рублей' }
+   {
+      id: 1,
+      title: 'Полное обучение',
+      header: '✅ Полное обучение с нуля (онлайн)',
+      text: 'Идеально для тех, кто хочет освоить домашнее пивоварение с азов.',
+      list: ['Разбор оборудования', 'Изучение технологии', 'Создание рецептов'],
+      price: 'Стоимость: 20 000 рублей'
+   },
+   {
+      id: 2,
+      title: 'Онлайн-консультации',
+      header: '✅ Онлайн-консультация по сложным вопросам',
+      text: 'Помогаем при наличии оборудования.',
+      list: ['Разбор ситуации', 'Рекомендации'],
+      price: 'Стоимость: индивидуально'
+   },
+   {
+      id: 3,
+      title: 'Составление рецептов',
+      header: '✅ Составление индивидуальных рецептов',
+      list: ['Рецепт под запрос', 'Сопровождение'],
+      price: 'от 3 000 рублей'
+   }
 ]
 </script>
 
@@ -182,23 +224,27 @@ const tabs = [
    box-sizing: border-box;
 }
 
+/* Класс ошибки: красная рамка */
 .error-input {
    border-color: #e04b4b !important;
    background-color: #fff6f6;
 }
 
+/* Текст ошибки */
 .error-text {
-   color: #e04b4b;
+   color: white;
    margin: 6px 0 0 0;
    font-size: 14px;
 }
 
+/* Успех */
 .success {
    color: #1a8a1a;
    margin-top: 10px;
    font-weight: 600;
 }
 
+/* Кнопка */
 .contact-form .button {
    align-self: flex-start;
    padding: 0.6rem 1rem;
