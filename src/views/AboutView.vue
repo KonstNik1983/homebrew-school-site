@@ -188,15 +188,14 @@ const tabs = [
 }
 
 .error-text {
-   color: #e04b4b;
+   color: white;
    margin: 6px 0 0 0;
-   font-size: 14px;
+   font-size: 18px;
 }
 
 .success {
-   color: #1a8a1a;
-   margin-top: 10px;
-   font-weight: 600;
+   color: white;
+   font-weight: 400;
 }
 
 .contact-form .button {

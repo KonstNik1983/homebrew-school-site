@@ -61,7 +61,7 @@
             <nav class="header-menu">
                <ul class="header-menu-list">
                   <li class="header-menu-item">
-                     <a href="#main-page" class="header-menu-link is-current" id="home">На верх <div class="arrow-top">↑
+                     <a href="#main-page" class="header-menu-link" id="home">На верх <div class="arrow-top">↑
                         </div></a>
                   </li>
                   <li class="header-menu-item">
