@@ -461,6 +461,7 @@ button:hover {
  .swiper-button-prev, .swiper-rtl .swiper-button-next{
     right: auto;
     color: white;
+    left: -9px !important;
  }
 
 .footer-content {
