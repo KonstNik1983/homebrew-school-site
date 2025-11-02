@@ -47,12 +47,16 @@
             <b>Чтобы оставить заявку на консультацию, заполните форму ниже:</b>
          </p>
 
-         <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="contact-form"
+         <form name="contact" method="POST" data-netlify="true" netlify-honeypot="info_code" class="contact-form"
             @submit.prevent="handleSubmit">
             <!-- Netlify hidden fields -->
             <input type="hidden" name="form-name" value="contact" />
-            <p hidden>
-               <label>Не заполняйте это поле: <input name="bot-field" /></label>
+
+            <!-- ✅ honeypot-поле -->
+            <p class="extra-info">
+               <label>Не заполняйте это поле:
+                  <input type="text" name="info_code" tabindex="-1" autocomplete="off" />
+               </label>
             </p>
 
             <!-- Имя -->
@@ -204,5 +208,13 @@ const tabs = [
    border-radius: 8px;
    font-weight: 600;
    margin-bottom: 20px;
+}
+
+.extra-info {
+   position: absolute;
+   left: -9999px;
+   width: 1px;
+   height: 1px;
+   overflow: hidden;
 }
 </style>
